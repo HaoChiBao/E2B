@@ -550,7 +550,9 @@ class Sandbox(SandboxBase):
 
         :param file_or_url: The file or URL to open.
         """
-        handle = self.commands.run(f"xdg-open {file_or_url}", background=True)
+        handle = self.commands.run(
+            f"xdg-open {quote_string(file_or_url)}", background=True
+        )
         handle.disconnect()
 
     def get_current_window_id(self) -> str:
@@ -573,13 +575,18 @@ class Sandbox(SandboxBase):
         """
         Get the title of the window with the given ID.
         """
-        return self.commands.run(f"xdotool getwindowname {window_id}").stdout.strip()
+        return self.commands.run(
+            f"xdotool getwindowname {quote_string(window_id)}"
+        ).stdout.strip()
 
     def launch(self, application: str, uri: Optional[str] = None):
         """
         Launch an application.
         """
-        handle = self.commands.run(
-            f"gtk-launch {application} {uri or ''}", background=True, timeout=0
+        command = (
+            f"gtk-launch {quote_string(application)} {quote_string(uri)}"
+            if uri
+            else f"gtk-launch {quote_string(application)}"
         )
+        handle = self.commands.run(command, background=True, timeout=0)
         handle.disconnect()
